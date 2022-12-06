@@ -10,12 +10,15 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import Addtraining from "./Addtraining";
+import moment from "moment";
+import { PropertyKeys } from "ag-grid-community";
 
 export default function Traininglist() {
 
 
   const gridRef = useRef();
-  const [cars, setCars] = useState([]);
+  const [training, setTraining] = useState([]);
   const [open, setOpen] = useState(false);
   
   useEffect(() => fetchData(), []);
@@ -24,7 +27,8 @@ export default function Traininglist() {
       {
           field: 'date',
           sortable: true,
-          filter: true
+          filter: true,
+          valueFormatter: (params) => moment(params.value).format('DD/MM/YYYY HH:mm')
       },
       {
           field: 'duration',
@@ -35,20 +39,39 @@ export default function Traininglist() {
           field: 'activity',
           sortable: true,
           filter: true
+      },
+      {
+        field: 'customer',
+        sortable: true,
+        filter: true,
+        valueGetter: (params) => params.data.customer.firstname + ' ' + params.data.customer.lastname
+      },
+      {
+          sortable: false,
+          filter: false,
+          width: 120,
+          headerName: '',
+          field: 'id',
+          cellRenderer: row => <Button color = 'error' startIcon={<DeleteIcon />} onClick={() => deleteTraining(row.value)}>Delete</Button>
       }
       
   ]
   
   const fetchData = () => {
-      fetch('https://customerrest.herokuapp.com/api/trainings')
+      fetch('https://customerrest.herokuapp.com/gettrainings')
       .then(response => response.json())
-      .then(data => setCars(data.content))
-      console.log("customers")
+      .then(data => setTraining(data))
+      console.log("trainings")
   }
   
-  
-  
-  
+
+  const deleteTraining = (id) => {
+    if (window.confirm('Are you sure?')) {
+        fetch('https://customerrest.herokuapp.com/api/trainings/' + id, {method: 'DELETE'})
+        .then(res => fetchData())
+        .catch(err => console.error(err))
+    }
+  }
 
     return (
       <div>
@@ -60,13 +83,16 @@ export default function Traininglist() {
             <li>
               <Link to="/traininglist">Training List</Link>
             </li>
+            <li>
+            
+            </li>
           </ul>
         </nav>
           <h1>Training List</h1>
-        <div className="ag-theme-material"style={{height: '800px', width: '40%', margin: 'auto'}} >
+        <div className="ag-theme-material"style={{height: '800px', width: '50%', margin: 'auto'}} >
             <AgGridReact className='grid'
             columnDefs={columns}
-            rowData={cars}
+            rowData={training}
             animateRows={true}
             ref={gridRef}
             onGridReady={params => gridRef.current = params.api}

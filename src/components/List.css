@@ -7,13 +7,9 @@
 
 h1 {
     color: white;
-    
+    text-align: center;
 }
 
-nav {
-    
-    background-color: rgb(129, 129, 129);
-  }
   
   ul {
     list-style-type: none;
@@ -38,3 +34,4 @@ nav {
     background-color: rgb(149, 149, 149);
     
   }
+

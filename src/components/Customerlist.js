@@ -12,6 +12,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import Addcustomer from "./Addcustomer";
 import Editcustomer from "./Editcustomer";
+import Addtraining from "./Addtraining";
 
 
 export default function Customerlist() {
@@ -58,6 +59,13 @@ export default function Customerlist() {
             field: 'phone',
             sortable: true,
             filter: true
+        },
+        {
+            sortable: false,
+            filter: false,
+            headerName: '',
+            valueGetter: (row) => row.data.links[0].href,
+            cellRenderer: row => <Addtraining addTraining={addTraining} url={row.value} customer={row.data}/>
         },
         {
             sortable: false,
@@ -118,23 +126,38 @@ export default function Customerlist() {
         .catch(err => console.error(err))
       }
 
+      const addTraining = (training) => {
+        fetch('https://customerrest.herokuapp.com/api/trainings', {
+            method: 'POST',
+            body: JSON.stringify(training),
+            headers: { 
+                'Content-type': 'application/json' 
+            }
+          })
+          .then(res => {
+            setOpen(true);
+          })
+          .catch(err => console.error(err))
+    } 
+
     return (
       <div>
-        <nav>
+        <nav class="navMenu">
           <ul>
             <li>
-              <Link to="/">Customer List</Link>
+                <Link to="/">Customer List</Link>
             </li>
             <li>
-              <Link to="/traininglist">Training List</Link>
+                <Link to="/traininglist">Training List</Link>
             </li>
             <li>
-            <Addcustomer saveCustomer={saveCustomer}/>
+                <Addcustomer class="addcustomer" saveCustomer={saveCustomer}/>
             </li>
           </ul>
         </nav>
+        <div class="dot"></div>
         <h1>Customer List</h1>
-        <div className="ag-theme-material"style={{height: '900px', width: '90%', margin: 'auto'}} >
+        <div className="ag-theme-material"style={{height: '1000px', width: '100%', margin: 'auto'}} >
             <AgGridReact className='grid'
             columnDefs={columns}
             rowData={customer}
